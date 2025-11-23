@@ -1,0 +1,94 @@
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-white">Productos</h2>
+        <a *ngIf="getCartItemCount() > 0" routerLink="/home/cart"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors cursor-pointer">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                </path>
+            </svg>
+            <span>{{ getCartItemCount() }} items</span>
+        </a>
+    </div>
+
+    <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+        <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+        </svg>
+    </div>
+
+    <div *ngIf="successMessage" class="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-lg mb-6">
+        {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-6">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let product of products"
+            class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-2xl overflow-hidden hover:border-indigo-500/50 transition-all">
+            <div class="h-48 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 flex items-center justify-center">
+                <svg class="w-20 h-20 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
+                    </path>
+                </svg>
+            </div>
+
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="text-lg font-bold text-white">{{ product.name }}</h3>
+                    <span class="bg-indigo-600/20 text-indigo-400 text-xs px-2 py-1 rounded">{{ product.productCondition
+                        }}</span>
+                </div>
+
+                <p class="text-slate-400 text-sm mb-4 line-clamp-2">{{ product.description }}</p>
+
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center text-sm">
+                        <span class="text-slate-500">Marca:</span>
+                        <span class="text-white ml-2">{{ product.brandName }}</span>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-slate-500">Categoría:</span>
+                        <span class="text-white ml-2">{{ product.categoryName }}</span>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-slate-500">Stock:</span>
+                        <span class="text-white ml-2">{{ product.stock }} {{ product.metricUnitName }}</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <div>
+                        <p class="text-2xl font-bold text-white">S/{{ product.price }}</p>
+                        <p class="text-xs text-slate-400">SKU: {{ product.sku }}</p>
+                    </div>
+                    <button (click)="addToCart(product.id)" [disabled]="product.stock === 0"
+                        class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Agregar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && products.length === 0" class="text-center py-12">
+        <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+            </path>
+        </svg>
+        <p class="text-slate-400">No hay productos disponibles</p>
+    </div>
+</div>

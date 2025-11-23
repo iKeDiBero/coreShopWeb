@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -19,7 +19,8 @@ export class LoginComponent {
         private fb: FormBuilder,
         private authService: AuthService,
         private router: Router,
-        @Inject(PLATFORM_ID) private platformId: Object
+        @Inject(PLATFORM_ID) private platformId: Object,
+        private cdr: ChangeDetectorRef
     ) {
         this.loginForm = this.fb.group({
             username: ['', [Validators.required]],
@@ -31,6 +32,7 @@ export class LoginComponent {
         if (this.loginForm.valid) {
             this.isLoading = true;
             this.errorMessage = '';
+            this.cdr.detectChanges();
 
             this.authService.login(this.loginForm.value).subscribe({
                 next: (response) => {
@@ -40,6 +42,7 @@ export class LoginComponent {
                         localStorage.setItem('user', JSON.stringify(response));
                     }
                     this.isLoading = false;
+                    this.cdr.detectChanges();
                     this.router.navigate(['/home']);
                 },
                 error: (error) => {
@@ -50,6 +53,7 @@ export class LoginComponent {
                     } else {
                         this.errorMessage = 'Ocurrió un error al iniciar sesión. Inténtelo más tarde.';
                     }
+                    this.cdr.detectChanges();
                 }
             });
         } else {

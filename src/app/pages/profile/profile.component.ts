@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { UserService, UserProfile } from '../../services/user.service';
 
 @Component({
@@ -13,19 +13,30 @@ export class ProfileComponent implements OnInit {
     isLoading: boolean = true;
     errorMessage: string = '';
 
-    constructor(private userService: UserService) { }
+    constructor(
+        private userService: UserService,
+        private cdr: ChangeDetectorRef,
+        @Inject(PLATFORM_ID) private platformId: Object
+    ) { }
 
     ngOnInit() {
-        this.userService.getProfile().subscribe({
-            next: (response) => {
-                this.profile = response.data;
-                this.isLoading = false;
-            },
-            error: (error) => {
-                console.error('Error fetching profile', error);
-                this.errorMessage = 'No se pudo cargar la información del perfil.';
-                this.isLoading = false;
-            }
-        });
+        if (isPlatformBrowser(this.platformId)) {
+            this.userService.getProfile().subscribe({
+                next: (response) => {
+                    console.log('Profile loaded:', response);
+                    this.profile = response.data;
+                    this.isLoading = false;
+                    this.cdr.detectChanges();
+                },
+                error: (error) => {
+                    console.error('Error fetching profile', error);
+                    this.errorMessage = 'No se pudo cargar la información del perfil.';
+                    this.isLoading = false;
+                    this.cdr.detectChanges();
+                }
+            });
+        } else {
+            this.isLoading = false;
+        }
     }
 }
