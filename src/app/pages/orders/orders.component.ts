@@ -133,7 +133,6 @@ export class OrdersComponent implements OnInit {
             next: (response) => {
                 const paymentData = response.data;
 
-                // Configurar el botón de pago de Niubiz
                 VisanetCheckout.configure({
                     sessiontoken: paymentData.sessionToken,
                     channel: 'web',
@@ -142,10 +141,10 @@ export class OrdersComponent implements OnInit {
                     amount: paymentData.amount.toFixed(2),
                     expirationminutes: '20',
                     timeouturl: window.location.origin + '/home/orders',
-                    merchantlogo: window.location.origin + '/assets/logo.png',
+                    merchantlogo: window.location.origin + '',
                     merchantname: 'CoreShop',
                     formbuttoncolor: '#6366f1',
-                    action: window.location.origin + '/payment-response',
+                    action: window.location.origin + '',
                     complete: (params: any) => {
                         console.log('Pago completado:', params);
                         this.successMessage = 'Pago procesado exitosamente';
@@ -155,7 +154,6 @@ export class OrdersComponent implements OnInit {
                     }
                 });
 
-                // Abrir el popup de pago
                 VisanetCheckout.open();
                 this.isLoading = false;
                 this.cdr.detectChanges();

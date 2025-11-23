@@ -42,6 +42,12 @@ export class HomeComponent implements OnInit {
             this.pageTitle = 'Mi Perfil';
         } else if (url.includes('/dashboard')) {
             this.pageTitle = 'Dashboard';
+        } else if (url.includes('/cart')) {
+            this.pageTitle = 'Carrito';
+        } else if (url.includes('/orders')) {
+            this.pageTitle = 'Órdenes';
+        } else if (url.includes('/products')) {
+            this.pageTitle = 'Productos';
         } else {
             this.pageTitle = 'CoreShop';
         }
