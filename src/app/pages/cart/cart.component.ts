@@ -106,6 +106,10 @@ export class CartComponent implements OnInit {
         });
     }
 
+    moveToProducts() {
+        this.router.navigate(['/home/products']);
+    }
+
     updateQuantity(productId: number, newQuantity: number) {
         if (!this.cart?.items || newQuantity < 1) return;
 
@@ -139,10 +143,10 @@ export class CartComponent implements OnInit {
             next: (response) => {
                 this.showSuccess('Orden creada exitosamente');
                 this.isLoading = false;
-                // Recargar el carrito (debería estar vacío ahora)
+
                 setTimeout(() => {
                     this.loadCart();
-                    this.router.navigate(['/home/dashboard']);
+                    //this.router.navigate(['/home/dashboard']);
                 }, 2000);
             },
             error: (error) => {

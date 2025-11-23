@@ -26,10 +26,12 @@
             </path>
         </svg>
         <p class="text-slate-400 mb-4">Tu carrito está vacío</p>
-        <a routerLink="/home/products"
+        <p class="text-slate-400 mb-4">Si deseas agregar productos, puedes ir al catalogo de productos</p>
+
+        <button (click)="moveToProducts()"
             class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg transition-colors">
             Ir a Productos
-        </a>
+        </button>
     </div>
 
     <div *ngIf="!isLoading && hasCartItems" class="space-y-6">

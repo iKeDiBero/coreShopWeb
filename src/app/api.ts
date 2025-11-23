@@ -19,5 +19,6 @@ export const CART_ENDPOINTS = {
 };
 
 export const ORDER_ENDPOINTS = {
-    CREATE_FROM_CART: `${API_BASE_URL}/orders/from-cart`
+    CREATE_FROM_CART: `${API_BASE_URL}/orders/from-cart`,
+    GET_ALL: `${API_BASE_URL}/orders`
 };

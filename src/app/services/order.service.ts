@@ -19,4 +19,12 @@ export class OrderService {
     createOrderFromCart(): Observable<OrderResponse> {
         return this.http.post<OrderResponse>(ORDER_ENDPOINTS.CREATE_FROM_CART, {});
     }
+
+    getAllOrders(): Observable<OrderResponse> {
+        return this.http.get<OrderResponse>(ORDER_ENDPOINTS.GET_ALL);
+    }
+
+    generatePaymentToken(orderId: number): Observable<OrderResponse> {
+        return this.http.post<OrderResponse>(`${ORDER_ENDPOINTS.GET_ALL}/${orderId}/payment-token`, {});
+    }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angu
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ProductService, Product } from '../../services/product.service';
 import { CartService, Cart } from '../../services/cart.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-products',
@@ -20,6 +21,7 @@ export class ProductsComponent implements OnInit {
         private productService: ProductService,
         private cartService: CartService,
         private cdr: ChangeDetectorRef,
+        private router: Router,
         @Inject(PLATFORM_ID) private platformId: Object
     ) { }
 
@@ -30,6 +32,10 @@ export class ProductsComponent implements OnInit {
         } else {
             this.isLoading = false;
         }
+    }
+
+    MoveToCart() {
+        this.router.navigate(['/home/cart']);
     }
 
     loadProducts() {
