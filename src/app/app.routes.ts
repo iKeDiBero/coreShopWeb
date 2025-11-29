@@ -8,6 +8,7 @@ import { CartComponent } from './pages/cart/cart.component';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { PaymentResponseComponent } from './pages/payment-response/payment-response.component';
 import { WarehouseComponent } from './pages/warehouse/warehouse.component';
+import { SupportComponent } from './pages/support/support.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
             { path: 'cart', component: CartComponent },
             { path: 'orders', component: OrdersComponent },
             { path: 'warehouse', component: WarehouseComponent },
+            { path: 'support', component: SupportComponent },
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
     },
