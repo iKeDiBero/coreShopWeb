@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { OrderService } from '../../services/order.service';
+import { OrderService, PaymentCallbackData } from '../../services/order.service';
 import { Router } from '@angular/router';
 
 // Declarar VisanetCheckout como global
@@ -129,9 +129,15 @@ export class OrdersComponent implements OnInit {
         this.errorMessage = '';
         this.successMessage = '';
 
+        // Generar un ID de sesión único para métodos de pago con redirección (como Cuotéalo)
+        const sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
         this.orderService.generatePaymentToken(order.id).subscribe({
             next: (response) => {
                 const paymentData = response.data;
+
+                // URL de respuesta con orderId y sessionId para identificar la transacción
+                const paymentResponseUrl = `${window.location.origin}/payment-response?orderId=${order.id}&sessionId=${sessionId}`;
 
                 VisanetCheckout.configure({
                     sessiontoken: paymentData.sessionToken,
@@ -140,17 +146,36 @@ export class OrdersComponent implements OnInit {
                     purchasenumber: order.id.toString(),
                     amount: paymentData.amount.toFixed(2),
                     expirationminutes: '20',
-                    timeouturl: window.location.origin + '/home/orders',
-                    merchantlogo: window.location.origin + '',
+                    timeouturl: `${window.location.origin}/home/orders`,
+                    merchantlogo: `${window.location.origin}/assets/logo.png`,
                     merchantname: 'CoreShop',
                     formbuttoncolor: '#6366f1',
-                    action: window.location.origin + '',
+                    // Action apunta al backend que procesará el POST de Niubiz
+                    // Después el backend redirigirá al frontend con el resultado
+                    action: `http://localhost:8081/api/orders/niubiz-callback?orderId=${order.id}&sessionId=${sessionId}&amount=${paymentData.amount}`,
                     complete: (params: any) => {
-                        console.log('Pago completado:', params);
-                        this.successMessage = 'Pago procesado exitosamente';
-                        this.loadOrders();
-                        this.isLoading = false;
-                        this.cdr.detectChanges();
+                        console.log('=== VisanetCheckout Complete Callback ===');
+                        console.log('Full params object:', JSON.stringify(params, null, 2));
+                        console.log('Params keys:', Object.keys(params || {}));
+                        
+                        // Intentar obtener el token de diferentes propiedades posibles
+                        const transactionToken = params?.transactionToken || 
+                                                 params?.token || 
+                                                 params?.tokenId ||
+                                                 params?.transactionId ||
+                                                 null;
+                        
+                        console.log('Transaction Token found:', transactionToken);
+                        
+                        // El transactionToken viene en el callback
+                        // Necesitamos enviarlo al backend para autorizar la transacción
+                        if (transactionToken) {
+                            this.authorizePayment(order.id, transactionToken, paymentData.amount, sessionId);
+                        } else {
+                            // Si llegamos aquí sin token, es porque Niubiz redirigió al action
+                            // El backend manejará el procesamiento
+                            console.log('No token in complete callback - Niubiz will redirect to action URL');
+                        }
                     }
                 });
 
@@ -161,6 +186,44 @@ export class OrdersComponent implements OnInit {
             error: (error) => {
                 console.error('Error generating payment token', error);
                 this.errorMessage = 'No se pudo iniciar el proceso de pago.';
+                this.isLoading = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    /**
+     * Autoriza el pago enviando el transactionToken al backend
+     */
+    private authorizePayment(orderId: number, transactionToken: string, amount: number, sessionId: string) {
+        this.isLoading = true;
+        
+        const callbackData: PaymentCallbackData = {
+            transactionToken: transactionToken,
+            purchaseNumber: orderId.toString(),
+            amount: amount.toString()
+        };
+
+        console.log('=== Sending authorization request ===');
+        console.log('Order ID:', orderId);
+        console.log('Transaction Token:', transactionToken);
+        console.log('Amount:', amount);
+
+        this.orderService.processPaymentCallback(orderId, sessionId, callbackData).subscribe({
+            next: (response: any) => {
+                console.log('Authorization response:', response);
+                if (response.data.paymentSuccessful) {
+                    this.successMessage = 'Pago procesado exitosamente';
+                } else {
+                    this.errorMessage = response.data.message || 'El pago no fue autorizado';
+                }
+                this.loadOrders();
+                this.isLoading = false;
+                this.cdr.detectChanges();
+            },
+            error: (error: any) => {
+                console.error('Error authorizing payment:', error);
+                this.errorMessage = 'Error al autorizar el pago. Por favor, verifica tu orden.';
                 this.isLoading = false;
                 this.cdr.detectChanges();
             }

@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:8080/api';
+export const API_BASE_URL = 'http://localhost:8081/api';
 
 export const AUTH_ENDPOINTS = {
     LOGIN: `${API_BASE_URL}/auth/login`
@@ -20,5 +20,6 @@ export const CART_ENDPOINTS = {
 
 export const ORDER_ENDPOINTS = {
     CREATE_FROM_CART: `${API_BASE_URL}/orders/from-cart`,
-    GET_ALL: `${API_BASE_URL}/orders`
+    GET_ALL: `${API_BASE_URL}/orders`,
+    PAYMENT_CALLBACK: `${API_BASE_URL}/orders/payment-callback`
 };

@@ -1,0 +1,311 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-white">Mi Almacén</h1>
+            <p class="text-slate-400 mt-1">Productos de tus compras completadas</p>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center py-12">
+        <svg class="animate-spin h-10 w-10 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+        </svg>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && errorMessage" class="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
+        <svg class="w-12 h-12 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="text-red-400">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && !errorMessage">
+        <!-- Summary Cards -->
+        <div *ngIf="summary" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- Total Products -->
+            <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-sm">Total Productos</p>
+                        <p class="text-2xl font-bold text-white">{{ summary.totalProducts }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unique Products -->
+            <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-sm">Productos Únicos</p>
+                        <p class="text-2xl font-bold text-white">{{ summary.uniqueProducts }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Value -->
+            <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-sm">Valor Total</p>
+                        <p class="text-2xl font-bold text-white">{{ formatCurrency(summary.totalValue) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Orders -->
+            <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-sm">Órdenes Completadas</p>
+                        <p class="text-2xl font-bold text-white">{{ summary.completedOrders }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Summary -->
+        <div *ngIf="summary && summary.categorySummary.length > 0" 
+            class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-6 mb-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Productos por Categoría</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div *ngFor="let cat of summary.categorySummary" 
+                    class="bg-slate-900/50 rounded-lg p-3 text-center hover:bg-slate-900/70 transition-colors cursor-pointer"
+                    (click)="selectedCategory = cat.categoryName">
+                    <p class="text-2xl font-bold text-indigo-400">{{ cat.totalQuantity }}</p>
+                    <p class="text-slate-400 text-sm truncate" [title]="cat.categoryName">{{ cat.categoryName }}</p>
+                    <p class="text-slate-500 text-xs">{{ cat.uniqueProducts }} productos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <!-- Search -->
+                <div class="flex-1">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" 
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" 
+                            placeholder="Buscar productos..." 
+                            (input)="onSearch($event)"
+                            class="w-full bg-slate-900/50 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <!-- Category Filter -->
+                <select (change)="onCategoryChange($event)"
+                    class="bg-slate-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">Todas las categorías</option>
+                    <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                </select>
+
+                <!-- Sort -->
+                <select (change)="onSortChange($event)"
+                    class="bg-slate-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="quantity">Ordenar por cantidad</option>
+                    <option value="name">Ordenar por nombre</option>
+                    <option value="value">Ordenar por valor</option>
+                    <option value="date">Ordenar por fecha</option>
+                </select>
+
+                <!-- Sort Order -->
+                <button (click)="toggleSortOrder()"
+                    class="bg-slate-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-white hover:bg-slate-700 transition-colors">
+                    <svg *ngIf="sortOrder === 'desc'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                    <svg *ngIf="sortOrder === 'asc'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="products.length === 0" 
+            class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-12 text-center">
+            <svg class="w-16 h-16 text-slate-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-white mb-2">Tu almacén está vacío</h3>
+            <p class="text-slate-400">Los productos de tus compras completadas aparecerán aquí.</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div *ngIf="filteredProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngFor="let product of filteredProducts" 
+                class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden hover:border-indigo-500/50 transition-all group">
+                
+                <!-- Product Image -->
+                <div class="h-40 bg-slate-900/50 flex items-center justify-center overflow-hidden">
+                    <img *ngIf="product.imageBase64" 
+                        [src]="'data:image/jpeg;base64,' + product.imageBase64" 
+                        [alt]="product.name"
+                        class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <svg *ngIf="!product.imageBase64" class="w-16 h-16 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+
+                <!-- Product Info -->
+                <div class="p-4">
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <h4 class="font-semibold text-white truncate flex-1" [title]="product.name">{{ product.name }}</h4>
+                        <span class="bg-indigo-500/20 text-indigo-400 text-sm font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+                            x{{ product.quantity }}
+                        </span>
+                    </div>
+
+                    <p class="text-slate-400 text-sm mb-3 line-clamp-2">{{ product.description || 'Sin descripción' }}</p>
+
+                    <div class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Categoría:</span>
+                            <span class="text-slate-300">{{ product.categoryName }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Marca:</span>
+                            <span class="text-slate-300">{{ product.brandName }}</span>
+                        </div>
+                        <div *ngIf="product.sku" class="flex justify-between">
+                            <span class="text-slate-500">SKU:</span>
+                            <span class="text-slate-300 font-mono text-xs">{{ product.sku }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-slate-400 text-sm">Valor total:</span>
+                            <span class="text-lg font-bold text-green-400">{{ formatCurrency(product.totalValue) }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500">
+                            <span>Primera compra: {{ formatDate(product.firstPurchase) }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500">
+                            <span>Última compra: {{ formatDate(product.lastPurchase) }}</span>
+                        </div>
+                    </div>
+
+                    <button (click)="viewProductHistory(product)"
+                        class="w-full mt-4 bg-slate-700/50 hover:bg-indigo-600 text-white py-2 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Ver historial de compras
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- No results after filter -->
+        <div *ngIf="products.length > 0 && filteredProducts.length === 0" 
+            class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-xl p-8 text-center">
+            <svg class="w-12 h-12 text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <p class="text-slate-400">No se encontraron productos con los filtros aplicados.</p>
+        </div>
+    </div>
+</div>
+
+<!-- History Modal -->
+<div *ngIf="showHistoryModal" 
+    class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    (click)="closeHistoryModal()">
+    <div class="bg-slate-800 border border-white/10 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-hidden"
+        (click)="$event.stopPropagation()">
+        
+        <!-- Modal Header -->
+        <div class="bg-slate-900/50 px-6 py-4 border-b border-white/10 flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-white">Historial de Compras</h3>
+                <p class="text-slate-400 text-sm">{{ selectedProduct?.name }}</p>
+            </div>
+            <button (click)="closeHistoryModal()" 
+                class="text-slate-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Modal Content -->
+        <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <!-- Loading -->
+            <div *ngIf="isHistoryLoading" class="flex justify-center py-8">
+                <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+            </div>
+
+            <!-- History List -->
+            <div *ngIf="!isHistoryLoading" class="space-y-3">
+                <div *ngFor="let entry of purchaseHistory" 
+                    class="bg-slate-900/50 rounded-lg p-4 border border-white/5">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="text-white font-medium">Orden #{{ entry.orderId }}</span>
+                            <p class="text-slate-400 text-sm">{{ formatDateTime(entry.purchaseDate) }}</p>
+                        </div>
+                        <span class="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
+                            {{ entry.status }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-400">Cantidad: <span class="text-white">{{ entry.quantity }}</span></span>
+                        <span class="text-slate-400">Precio: <span class="text-green-400">{{ formatCurrency(entry.price) }}</span></span>
+                    </div>
+                </div>
+
+                <div *ngIf="purchaseHistory.length === 0" class="text-center py-8">
+                    <p class="text-slate-400">No hay historial de compras disponible.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
