@@ -1,4 +1,7 @@
-export const API_BASE_URL = 'http://localhost:8081/api';
+import { environment } from '../environments/environment';
+
+export const API_BASE_URL = environment.apiBaseUrl;
+
 
 export const AUTH_ENDPOINTS = {
     LOGIN: `${API_BASE_URL}/auth/login`
